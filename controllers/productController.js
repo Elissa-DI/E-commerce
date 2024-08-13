@@ -62,6 +62,89 @@ export const getAllProducts = async (req, res) => {
 
 
 
+export const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const product = await prisma.product.findUnique({
+            where: {
+                id: String(id),
+            }
+        });
+
+        if (!product) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Product not found'
+                });
+        };
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error('Error retrieving product:', error.message);
+        res.status(500).json({ msg: 'Server error' });
+    }
+}
+
+
+
+
+
+export const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, category, stock } = req.body;
+
+        if (req.user.role !== 'ADMIN') {
+            return res
+                .status(403)
+                .json({
+                    msg: 'Access denied. Admins only.'
+                })
+        }
+
+        // Validate the request body
+        const { error } = productSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ msg: error.details[0].message });
+        }
+
+        // Check if the product exists
+        let product = await prisma.product.findUnique({
+            where: { id: String(id) },
+        });
+
+        if (!product) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
+
+        // Update the product
+        product = await prisma.product.update({
+            where: { id: Number(id) },
+            data: {
+                name,
+                description,
+                price,
+                category,
+                stock
+            },
+        });
+
+        res.status(200).json({
+            msg: 'Product updated successfully',
+            product
+        });
+    } catch (error) {
+        console.error('Error while updating product:', error.message);
+        res.status(500).json({ msg: 'Server error' });
+    }
+};
+
+
+
+
+
 
 
 export const deleteProduct = async (req, res) => {
