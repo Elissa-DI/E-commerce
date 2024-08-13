@@ -1,5 +1,6 @@
 import express from 'express';
 import userRoutes from './routes/user.js';
+import productRoutes from './routes/productRoutes.js'
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 //Routes
 app.use('/api/users', userRoutes)
+app.use('/api/products', productRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello Welcome to the E-Commerce backend system Feel free to explore our api endpoints!');

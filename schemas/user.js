@@ -12,6 +12,7 @@ const loginSchema = Joi.object({
     password: Joi.string().min(6).required(),
 });
 
+
 export {
     registerSchema,
     loginSchema,
