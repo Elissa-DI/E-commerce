@@ -14,7 +14,6 @@ export const createProduct = async (req, res) => {
 
         const { name, description, price, category, stock } = req.body;
 
-        // Check if the user is an admin
         if (req.user.role !== 'ADMIN') {
             return res
                 .status(403)
@@ -22,7 +21,7 @@ export const createProduct = async (req, res) => {
                     msg: 'Access denied. Admins only.'
                 })
         }
-        //Create a product
+
         const product = await prisma.product.create({
             data: {
                 name,
@@ -104,13 +103,11 @@ export const updateProduct = async (req, res) => {
                 })
         }
 
-        // Validate the request body
         const { error } = productSchema.validate(req.body);
         if (error) {
             return res.status(400).json({ msg: error.details[0].message });
         }
 
-        // Check if the product exists
         let product = await prisma.product.findUnique({
             where: { id: String(id) },
         });
@@ -119,9 +116,8 @@ export const updateProduct = async (req, res) => {
             return res.status(404).json({ msg: 'Product not found' });
         }
 
-        // Update the product
         product = await prisma.product.update({
-            where: { id: Number(id) },
+            where: { id: String(id) },
             data: {
                 name,
                 description,
@@ -149,17 +145,52 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     try {
-        const { error } = productSchema.validate(req.body);
-        if (error) {
-            return res.
-                status(400).
-                json({
-                    msg: error.details[0].message
+        if (req.user.role !== 'ADMIN') {
+            return res
+                .status(403)
+                .json({
+                    msg: 'Access denied. Admins only.'
                 })
         }
 
+        const { id } = req.params;
 
+        const product = await prisma.product.findUnique({
+            where:
+            {
+                id: String(id)
+            },
+        });
+
+        if (!product) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Product not found'
+                });
+        }
+
+        await prisma.product.delete({
+            where:
+            {
+                id: (id)
+            },
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Product deleted successfully'
+            });
     } catch (error) {
-
+        console.error(
+            'Error deleting product:',
+            error.message
+        );
+        res
+            .status(500)
+            .json({
+                msg: 'Server error'
+            });
     }
-}
+};
