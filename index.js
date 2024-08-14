@@ -1,7 +1,8 @@
 import express from 'express';
+import dotenv from "dotenv";
 import userRoutes from './routes/user.js';
 import productRoutes from './routes/productRoutes.js'
-import dotenv from "dotenv";
+import cartRoutes from './routes/cartRoutes.js'
 
 dotenv.config();
 
@@ -14,9 +15,10 @@ app.use(express.json());
 //Routes
 app.use('/api/users', userRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/carts', cartRoutes)
 
 app.get('/', (req, res) => {
-    res.send('Hello Welcome to the E-Commerce backend system Feel free to explore our api endpoints!');
+    res.send('Hello Welcome to our minimal E-Commerce backend system!');
 });
 
 app.listen(port, () => {
