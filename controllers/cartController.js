@@ -104,7 +104,7 @@ export const viewCart = async (req, res) => {
         res
             .status(200)
             .json({
-                msg: 'Cart retrieved successfully',
+                msg: cartItems.length > 0 ? 'Cart retrieved successfully' : 'Cart is empty',
                 cartItems
             });
     } catch (error) {
@@ -151,6 +151,46 @@ export const updateCart = async (req, res) => {
             .json({
                 msg: 'Cart item updated successfully',
                 cartItem
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
+export const removeFromCart = async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const userId = req.user.id;
+
+        // Find the cart item by ID and ensure it belongs to the logged-in user
+        const cartItem = await prisma.cartItem.findFirst({
+            where: {
+                id: itemId,
+                userId: userId
+            }
+        });
+
+        if (!cartItem)
+            return res
+                .status(404)
+                .json({
+                    msg: 'Cart item not found'
+                });
+
+        // Delete the cart item
+        await prisma.cartItem.delete({
+            where: {
+                id: cartItem.id
+            }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Cart item removed successfully'
             });
     } catch (error) {
         console.error(error.message);
