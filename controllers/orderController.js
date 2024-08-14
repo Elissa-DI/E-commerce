@@ -71,7 +71,10 @@ export const getOrders = async (req, res) => {
 
         res
             .status(200)
-            .json(orders);
+            .json({
+                msg: 'All Orders retrieved successfully',
+                orders
+            });
     } catch (error) {
         console.error(error.message);
         res
@@ -99,7 +102,10 @@ export const getOrderById = async (req, res) => {
 
         res
             .status(200)
-            .json(order);
+            .json({
+                msg: "Order retrieved successfully",
+                order
+            });
     } catch (error) {
         console.error(error.message);
         res

@@ -5,7 +5,7 @@ import { createOrder, getOrderById, getOrders } from '../controllers/orderContro
 const router = express.Router();
 
 router.post('/', auth, createOrder);
-router.post('/', auth, getOrders);
-router.post('/:id', auth, getOrderById);
+router.get('/', auth, getOrders);
+router.get('/:id', auth, getOrderById);
 
 export default router
