@@ -80,4 +80,30 @@ export const getOrders = async (req, res) => {
     }
 };
 
+export const getOrderById = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const orderId = req.params.id;
 
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+        });
+
+        if (!order || order.userId !== userId) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Order not found or access denied'
+                });
+        }
+
+        res
+            .status(200)
+            .json(order);
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
