@@ -180,7 +180,7 @@ export const deleteProduct = async (req, res) => {
         res
             .status(200)
             .json({
-                msg: 'Product deleted successfully'
+                msg: `${product.name} Product deleted successfully`
             });
     } catch (error) {
         console.error(

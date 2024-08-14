@@ -15,7 +15,7 @@ app.use(express.json());
 //Routes
 app.use('/api/users', userRoutes)
 app.use('/api/products', productRoutes)
-app.use('/api/carts', cartRoutes)
+app.use('/api/cart', cartRoutes)
 
 app.get('/', (req, res) => {
     res.send('Hello Welcome to our minimal E-Commerce backend system!');

@@ -18,6 +18,13 @@ export const addToCart = async (req, res) => {
                     msg: 'Product not found'
                 });
 
+        // Check if there is enough stock
+        if (product.stock < quantity) {
+            return res.status(400).json({
+                msg: 'Insufficient stock available'
+            });
+        }
+
         // Check if the item is already in the cart
         let cartItem = await prisma.cartItem.findUnique({
             where: {
@@ -49,12 +56,57 @@ export const addToCart = async (req, res) => {
             });
         }
 
+        await prisma.product.update({
+            where: {
+                id: productId
+            },
+            data: {
+                stock: product.stock - quantity
+            }
+        });
+
         res
             .status(201)
             .json({
-                msg: 'Item added to cart',
+                msg: 'Item added to cart and stock updated',
                 cartItem
             })
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+}
+
+export const viewCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        // Retrieve the cart items for the logged-in user
+        const cartItems = await prisma.cartItem.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                // Include product details in the response
+                product: { 
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        price: true,
+                        category: true
+                    }
+                }
+            }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Cart retrieved successfully',
+                cartItems
+            });
     } catch (error) {
         console.error(error.message);
         res

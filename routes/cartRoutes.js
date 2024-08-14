@@ -1,9 +1,10 @@
 import express from 'express';
 import auth from '../middlewares/auth.js';
-import { addToCart } from '../controllers/cartController.js';
+import { addToCart, viewCart } from '../controllers/cartController.js';
 
 const router = express.Router();
 
-router.post('/create', auth, addToCart);
+router.post('/', auth, addToCart);
+router.get('/', auth, viewCart);
 
 export default router
