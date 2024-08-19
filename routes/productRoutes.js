@@ -1,13 +1,15 @@
 import express from 'express';
 import {
     addReview,
-createProduct,
-deleteProduct,
-deleteReview,
-getAllProducts,
-getProductById,
-updateProduct,
-viewReviews
+    createProduct,
+    deleteProduct,
+    deleteReview,
+    filterProducts,
+    getAllProducts,
+    getProductById,
+    searchProducts,
+    updateProduct,
+    viewReviews
 } from '../controllers/productController.js';
 import auth from '../middlewares/auth.js';
 
@@ -22,5 +24,8 @@ router.delete('/:id', auth, deleteProduct);
 router.post('/:id/review', auth, addReview);
 router.get('/:id/reviews', viewReviews)
 router.delete('/:id/reviews/:reviewId', auth, deleteReview)
+//search
+router.get('/search', searchProducts);
+router.get('/filter', filterProducts);
 
 export default router;

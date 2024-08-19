@@ -294,3 +294,58 @@ export const deleteReview = async (req, res) => {
     }
 };
 
+export const searchProducts = async (req, res) => {
+    try {
+        const { q } = req.query;
+
+        const products = await prisma.product.findMany({
+            where: {
+                OR: [
+                    { name: { contains: q, mode: 'insensitive' } },
+                    { description: { contains: q, mode: 'insensitive' } }
+                ]
+            }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Products retrieved successfully',
+                products
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
+export const filterProducts = async (req, res) => {
+    try {
+        const { category, priceMin, priceMax } = req.query;
+
+        const products = await prisma.product.findMany({
+            where: {
+                AND: [
+                    category ? { category: { equals: category } } : {},
+                    priceMin ? { price: { gte: parseFloat(priceMin) } } : {},
+                    priceMax ? { price: { lte: parseFloat(priceMax) } } : {}
+                ]
+            }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Products retrieved successfully',
+                products
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
