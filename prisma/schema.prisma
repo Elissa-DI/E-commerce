@@ -36,6 +36,8 @@ model User {
   CartItem CartItem[]
 
   Order Order[]
+
+  Review Review[]
 }
 
 enum Role {
@@ -55,6 +57,20 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   cartItems CartItem[]
+  reviews Review[]
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String
+  productId String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Cart {

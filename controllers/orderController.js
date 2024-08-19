@@ -113,3 +113,112 @@ export const getOrderById = async (req, res) => {
             .send('Server error');
     }
 };
+
+export const cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const order = await prisma.order.findFirst({
+            where: {
+                id,
+                userId
+            }
+        });
+
+        if (!order) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Order not found or you are not authorized to cancel this order.'
+                });
+        }
+
+        await prisma.order.delete({
+            where: { id }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Order canceled successfully.'
+            });
+
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
+export const getAllOrders = async (req, res) => {
+    try {
+        const { role } = req.user;
+
+        if (role !== 'ADMIN') {
+            return res
+                .status(403)
+                .json({
+                    msg: 'Access denied. Admins only.'
+                });
+        }
+
+        const orders = await prisma.order.findMany();
+
+        res
+            .status(200)
+            .json({
+                msg: 'Orders retrieved successfully',
+                orders
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
+export const updateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const { role } = req.user;
+
+        if (role !== 'ADMIN') {
+            return res
+                .status(403)
+                .json({ msg: 'Access denied. Admins only.' });
+        }
+
+        const order = await prisma.order.findUnique({
+            where: { id }
+        });
+
+        if (!order) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Order not found'
+                });
+        }
+
+        const updatedOrder = await prisma.order.update({
+            where: { id },
+            data: { status }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Order status updated successfully',
+                updatedOrder
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};

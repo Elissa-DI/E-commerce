@@ -194,3 +194,103 @@ export const deleteProduct = async (req, res) => {
             });
     }
 };
+
+export const addReview = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const { id: productId } = req.params;
+        const userId = req.user.id;
+
+        const review = await prisma.review.create({
+            data: {
+                rating,
+                comment,
+                productId,
+                userId
+            }
+        });
+
+        res
+            .status(201)
+            .json({
+                msg: 'Review added successfully',
+                review
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+}
+
+export const viewReviews = async (req, res) => {
+    try {
+        const { id: productId } = req.params;
+
+        const reviews = await prisma.review.findMany({
+            where: { productId },
+            include: { user: true }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Reviews retrieved successfully',
+                reviews
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
+export const deleteReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const userId = req.user.id;
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: true }
+        });
+
+        if (!user || user.role !== 'ADMIN') {
+            return res
+                .status(403)
+                .json({
+                    msg: 'Access denied. Only admins can delete reviews.'
+                });
+        }
+
+        const review = await prisma.review.findUnique({
+            where: { id: reviewId }
+        });
+
+        if (!review) {
+            return res
+                .status(404)
+                .json({
+                    msg: 'Review not found'
+                });
+        }
+
+        await prisma.review.delete({
+            where: { id: reviewId }
+        });
+
+        res
+            .status(200)
+            .json({
+                msg: 'Review deleted successfully'
+            });
+    } catch (error) {
+        console.error(error.message);
+        res
+            .status(500)
+            .send('Server error');
+    }
+};
+
