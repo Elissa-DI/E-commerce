@@ -45,7 +45,7 @@ export const registerUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
+ 
 export const loginUser = async (req, res) => {
     try {
         // Validate request body

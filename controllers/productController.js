@@ -349,3 +349,6 @@ export const filterProducts = async (req, res) => {
     }
 };
 
+//delete a product
+
+

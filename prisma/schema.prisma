@@ -17,11 +17,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "mongodb"
-//   url      = env("DATABASE_URL")
-// }
-
 model User {
   id        String    @id @default(uuid())
   name      String
@@ -57,7 +52,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   cartItems CartItem[]
-  reviews Review[]
+  reviews   Review[]
 }
 
 model Review {
@@ -69,8 +64,8 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product   Product  @relation(fields: [productId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 }
 
 model Cart {
@@ -110,5 +105,16 @@ model Order {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   user      User        @relation(fields: [userId], references: [id])
+  payments  Payment[]
 }
 
+model Payment {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  amount    Float
+  currency  String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
